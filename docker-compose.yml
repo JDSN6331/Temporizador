@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  pulse-timer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pulse_precision_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - DB_PATH=/app/data/database.sqlite
+      - JWT_SECRET=pulse_precision_jwt_secret_key_easypanel_2026
+    volumes:
+      - pulse_sqlite_data:/app/data
+
+volumes:
+  pulse_sqlite_data:
+    driver: local

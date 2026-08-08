@@ -1,0 +1,25 @@
+{
+  "short_name": "Pulse",
+  "name": "Pulse & Precision - Timer & Analytics",
+  "description": "Temporizador de Treinos de Alta Performance, HIIT, Tabata, EMOM e Métricas de Atleta.",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#131313",
+  "theme_color": "#d2f000",
+  "display": "standalone",
+  "orientation": "portrait",
+  "categories": ["health", "fitness", "sports", "utilities"]
+}
