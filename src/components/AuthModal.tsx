@@ -21,6 +21,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [name, setName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   if (!isOpen) return null;
 
@@ -162,14 +163,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           <div>
             <label className="font-label-caps text-xs text-[#c6c9ab] block mb-1">SENHA</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-[#131313] border border-[#353534] rounded-xl px-4 py-3 text-sm text-[#e5e2e1] focus:border-accent outline-none"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-[#131313] border border-[#353534] rounded-xl pl-4 pr-11 py-3 text-sm text-[#e5e2e1] focus:border-accent outline-none"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#c6c9ab] hover:text-white p-1 cursor-pointer transition-colors"
+                aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+              >
+                <i className={showPassword ? 'fi fi-rr-eye-crossed text-base' : 'fi fi-rr-eye text-base'} />
+              </button>
+            </div>
           </div>
 
           <button
