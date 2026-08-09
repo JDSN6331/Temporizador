@@ -99,10 +99,10 @@ export default function App() {
   useEffect(() => {
     if (user && user.isLoggedIn) {
       api.getHistory().then((items) => {
-        if (items && items.length > 0) setHistoryItems(items);
+        if (Array.isArray(items)) setHistoryItems(items);
       });
       api.getPresets().then((presets) => {
-        if (presets) setCustomPresets(presets);
+        if (Array.isArray(presets)) setCustomPresets(presets);
       });
       api.getSettings().then((dbSettings) => {
         if (dbSettings) setSettings((prev) => ({ ...prev, ...dbSettings }));

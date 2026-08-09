@@ -29,6 +29,12 @@ export interface WorkoutHistoryItem {
   type: WorkoutType;
   colorBorder: string; // Tailwind border class e.g. "border-[#d2f000]"
   iconName: string;
+  workSeconds?: number;
+  restSeconds?: number;
+  prepSeconds?: number;
+  exercisesPerSet?: number;
+  setRestSeconds?: number;
+  totalSets?: number;
 }
 
 export interface UserProfile {

@@ -123,7 +123,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
 
       {/* FILTER TABS */}
       <div className="flex flex-wrap gap-2 mb-4 font-label-caps text-xs">
-        {['ALL', 'TABATA', 'EMOM', 'AMRAP', 'RECOVERY', 'STRENGTH'].map((type) => (
+        {['ALL', 'CUSTOM', 'TABATA', 'EMOM', 'AMRAP', 'RECOVERY', 'STRENGTH'].map((type) => (
           <button
             key={type}
             onClick={() => setFilterType(type)}
@@ -241,10 +241,13 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
                     name: selectedItem.title,
                     type: selectedItem.type,
                     subtitle: `${selectedItem.durationMinutes} MIN`,
-                    workSeconds: 45,
-                    restSeconds: 15,
-                    prepSeconds: 5,
-                    totalRounds: selectedItem.totalRounds || 8,
+                    workSeconds: selectedItem.workSeconds || 45,
+                    restSeconds: selectedItem.restSeconds || 15,
+                    prepSeconds: selectedItem.prepSeconds || 5,
+                    exercisesPerSet: selectedItem.exercisesPerSet || 1,
+                    setRestSeconds: selectedItem.setRestSeconds || 60,
+                    totalSets: selectedItem.totalSets || selectedItem.totalRounds || 4,
+                    totalRounds: selectedItem.totalRounds || 4,
                   });
                   setSelectedItem(null);
                 }}

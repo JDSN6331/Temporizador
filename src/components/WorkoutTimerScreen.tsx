@@ -344,7 +344,7 @@ export const WorkoutTimerScreen: React.FC<WorkoutTimerScreenProps> = ({
 
     const newHistory: WorkoutHistoryItem = {
       id: `w_${Date.now()}`,
-      title: `${preset.name} Workout`,
+      title: preset.name,
       dateStr,
       timestamp: Date.now(),
       durationMinutes: durationMin,
@@ -354,6 +354,12 @@ export const WorkoutTimerScreen: React.FC<WorkoutTimerScreenProps> = ({
       type: preset.type,
       colorBorder: preset.type === 'TABATA' ? 'border-[#d2f000]' : preset.type === 'EMOM' ? 'border-[#ffb4aa]' : 'border-[#d8e2ff]',
       iconName: preset.type === 'TABATA' ? 'local_fire_department' : preset.type === 'EMOM' ? 'timer' : 'fitness_center',
+      workSeconds: preset.workSeconds,
+      restSeconds: preset.restSeconds,
+      prepSeconds: preset.prepSeconds,
+      exercisesPerSet: exercisesPerSet,
+      setRestSeconds: setRestSeconds,
+      totalSets: totalSets,
     };
 
     onFinishWorkout(newHistory);
@@ -620,7 +626,7 @@ export const WorkoutTimerScreen: React.FC<WorkoutTimerScreenProps> = ({
               PARABÉNS! VOCÊ COMPLETOU O OBJETIVO.
             </p>
 
-            <div className="bg-[#131313] rounded-2xl p-4 grid grid-cols-3 gap-3 mb-6 text-left border border-[#353534]">
+            <div className="bg-[#131313] rounded-2xl p-4 grid grid-cols-2 gap-4 mb-6 text-left border border-[#353534]">
               <div>
                 <span className="font-label-caps text-[10px] text-[#c6c9ab] block uppercase">
                   Tempo Total
@@ -635,14 +641,6 @@ export const WorkoutTimerScreen: React.FC<WorkoutTimerScreenProps> = ({
                 </span>
                 <span className="font-bold text-lg text-accent">
                   {currentSet}/{totalSets}
-                </span>
-              </div>
-              <div>
-                <span className="font-label-caps text-[10px] text-[#c6c9ab] block uppercase">
-                  Intensidade
-                </span>
-                <span className="font-bold text-xs text-[#ffb4aa] uppercase block mt-1">
-                  {preset.intensity}
                 </span>
               </div>
             </div>

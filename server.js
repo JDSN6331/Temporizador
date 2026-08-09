@@ -42,7 +42,15 @@ let dbAdapter = {
           preset_category VARCHAR(255) NOT NULL,
           duration_seconds INTEGER NOT NULL,
           completed_at VARCHAR(255) NOT NULL,
-          calories_burned INTEGER DEFAULT 0
+          calories_burned INTEGER DEFAULT 0,
+          rounds_completed INTEGER DEFAULT 4,
+          total_rounds INTEGER DEFAULT 4,
+          work_seconds INTEGER,
+          rest_seconds INTEGER,
+          prep_seconds INTEGER,
+          exercises_per_set INTEGER,
+          set_rest_seconds INTEGER,
+          total_sets INTEGER
         );
 
         CREATE TABLE IF NOT EXISTS custom_presets (
@@ -68,6 +76,13 @@ let dbAdapter = {
           glassmorphism_enabled INTEGER DEFAULT 1
         );
       `);
+
+      // Safe column additions for existing PostgreSQL tables
+      const pgCols = ['rounds_completed', 'total_rounds', 'work_seconds', 'rest_seconds', 'prep_seconds', 'exercises_per_set', 'set_rest_seconds', 'total_sets'];
+      for (const col of pgCols) {
+        try { await this.pgPool.query(`ALTER TABLE workout_history ADD COLUMN ${col} INTEGER`); } catch (e) {}
+      }
+
       console.log('✅ PostgreSQL Schema Inicializado com Sucesso!');
     } else {
       console.log('📁 Conectando ao Banco de Dados SQLite...');
@@ -96,6 +111,14 @@ let dbAdapter = {
           duration_seconds INTEGER NOT NULL,
           completed_at TEXT NOT NULL,
           calories_burned INTEGER DEFAULT 0,
+          rounds_completed INTEGER DEFAULT 4,
+          total_rounds INTEGER DEFAULT 4,
+          work_seconds INTEGER,
+          rest_seconds INTEGER,
+          prep_seconds INTEGER,
+          exercises_per_set INTEGER,
+          set_rest_seconds INTEGER,
+          total_sets INTEGER,
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
 
@@ -124,6 +147,13 @@ let dbAdapter = {
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
       `);
+
+      // Safe column additions for existing SQLite tables
+      const sqliteCols = ['rounds_completed', 'total_rounds', 'work_seconds', 'rest_seconds', 'prep_seconds', 'exercises_per_set', 'set_rest_seconds', 'total_sets'];
+      for (const col of sqliteCols) {
+        try { this.sqliteDb.exec(`ALTER TABLE workout_history ADD COLUMN ${col} INTEGER`); } catch (e) {}
+      }
+
       console.log(`✅ SQLite Inicializado em: ${dbPath}`);
     }
   },
@@ -290,14 +320,22 @@ app.get('/api/history', authenticateToken, async (req, res) => {
     const rows = await dbAdapter.queryAll(
       `SELECT id, preset_name as "presetName", preset_category as "presetCategory", 
               duration_seconds as "durationSeconds", completed_at as "completedAt", 
-              calories_burned as "caloriesBurned"
+              calories_burned as "caloriesBurned", rounds_completed as "roundsCompleted",
+              total_rounds as "totalRounds", work_seconds as "workSeconds",
+              rest_seconds as "restSeconds", prep_seconds as "prepSeconds",
+              exercises_per_set as "exercisesPerSet", set_rest_seconds as "setRestSeconds",
+              total_sets as "totalSets"
        FROM workout_history 
        WHERE user_id = ? 
        ORDER BY completed_at DESC`,
       [req.user.id],
       `SELECT id, preset_name as "presetName", preset_category as "presetCategory", 
               duration_seconds as "durationSeconds", completed_at as "completedAt", 
-              calories_burned as "caloriesBurned"
+              calories_burned as "caloriesBurned", rounds_completed as "roundsCompleted",
+              total_rounds as "totalRounds", work_seconds as "workSeconds",
+              rest_seconds as "restSeconds", prep_seconds as "prepSeconds",
+              exercises_per_set as "exercisesPerSet", set_rest_seconds as "setRestSeconds",
+              total_sets as "totalSets"
        FROM workout_history 
        WHERE user_id = $1 
        ORDER BY completed_at DESC`,
@@ -312,16 +350,69 @@ app.get('/api/history', authenticateToken, async (req, res) => {
 
 app.post('/api/history', authenticateToken, async (req, res) => {
   try {
-    const { id, presetName, presetCategory, durationSeconds, completedAt, caloriesBurned } = req.body;
+    const {
+      id,
+      presetName,
+      presetCategory,
+      durationSeconds,
+      completedAt,
+      caloriesBurned,
+      roundsCompleted,
+      totalRounds,
+      workSeconds,
+      restSeconds,
+      prepSeconds,
+      exercisesPerSet,
+      setRestSeconds,
+      totalSets,
+    } = req.body;
     const historyId = id || `hist_${Date.now()}`;
-    
+
     await dbAdapter.execute(
-      `INSERT INTO workout_history (id, user_id, preset_name, preset_category, duration_seconds, completed_at, calories_burned)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [historyId, req.user.id, presetName || 'Treino Pulse', presetCategory || 'CUSTOM', durationSeconds || 0, completedAt || new Date().toISOString(), caloriesBurned || 0],
-      `INSERT INTO workout_history (id, user_id, preset_name, preset_category, duration_seconds, completed_at, calories_burned)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [historyId, req.user.id, presetName || 'Treino Pulse', presetCategory || 'CUSTOM', durationSeconds || 0, completedAt || new Date().toISOString(), caloriesBurned || 0]
+      `INSERT INTO workout_history (
+        id, user_id, preset_name, preset_category, duration_seconds, completed_at, 
+        calories_burned, rounds_completed, total_rounds, work_seconds, rest_seconds,
+        prep_seconds, exercises_per_set, set_rest_seconds, total_sets
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        historyId,
+        req.user.id,
+        presetName || 'Treino Pulse',
+        presetCategory || 'CUSTOM',
+        durationSeconds || 0,
+        completedAt || new Date().toISOString(),
+        caloriesBurned || 0,
+        roundsCompleted || 4,
+        totalRounds || 4,
+        workSeconds || null,
+        restSeconds || null,
+        prepSeconds || null,
+        exercisesPerSet || null,
+        setRestSeconds || null,
+        totalSets || null,
+      ],
+      `INSERT INTO workout_history (
+        id, user_id, preset_name, preset_category, duration_seconds, completed_at, 
+        calories_burned, rounds_completed, total_rounds, work_seconds, rest_seconds,
+        prep_seconds, exercises_per_set, set_rest_seconds, total_sets
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+      [
+        historyId,
+        req.user.id,
+        presetName || 'Treino Pulse',
+        presetCategory || 'CUSTOM',
+        durationSeconds || 0,
+        completedAt || new Date().toISOString(),
+        caloriesBurned || 0,
+        roundsCompleted || 4,
+        totalRounds || 4,
+        workSeconds || null,
+        restSeconds || null,
+        prepSeconds || null,
+        exercisesPerSet || null,
+        setRestSeconds || null,
+        totalSets || null,
+      ]
     );
 
     return res.json({ success: true, id: historyId });
@@ -356,6 +447,136 @@ app.delete('/api/history', authenticateToken, async (req, res) => {
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: 'Erro ao limpar histórico.' });
+  }
+});
+
+// ================= CUSTOM PRESETS ROUTES =================
+
+app.get('/api/presets', authenticateToken, async (req, res) => {
+  try {
+    const rows = await dbAdapter.queryAll(
+      `SELECT id, name, category, work_seconds as "workSeconds", rest_seconds as "restSeconds", 
+              sets, cycles, prep_seconds as "prepSeconds", set_rest_seconds as "setRestSeconds"
+       FROM custom_presets 
+       WHERE user_id = ? 
+       ORDER BY created_at DESC`,
+      [req.user.id],
+      `SELECT id, name, category, work_seconds as "workSeconds", rest_seconds as "restSeconds", 
+              sets, cycles, prep_seconds as "prepSeconds", set_rest_seconds as "setRestSeconds"
+       FROM custom_presets 
+       WHERE user_id = $1 
+       ORDER BY created_at DESC`,
+      [req.user.id]
+    );
+    return res.json(rows);
+  } catch (err) {
+    console.error('Erro ao buscar treinos personalizados:', err);
+    return res.status(500).json({ error: 'Erro ao buscar treinos personalizados.' });
+  }
+});
+
+app.post('/api/presets', authenticateToken, async (req, res) => {
+  try {
+    const { id, name, category, workSeconds, restSeconds, sets, cycles, prepSeconds, setRestSeconds } = req.body;
+    const presetId = id || `preset_${Date.now()}`;
+
+    await dbAdapter.execute(
+      `INSERT INTO custom_presets (id, user_id, name, category, work_seconds, rest_seconds, sets, cycles, prep_seconds, set_rest_seconds)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [presetId, req.user.id, name || 'Treino Personalizado', category || 'CUSTOM', workSeconds || 20, restSeconds || 10, sets || 4, cycles || 1, prepSeconds || 10, setRestSeconds || 60],
+      `INSERT INTO custom_presets (id, user_id, name, category, work_seconds, rest_seconds, sets, cycles, prep_seconds, set_rest_seconds)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [presetId, req.user.id, name || 'Treino Personalizado', category || 'CUSTOM', workSeconds || 20, restSeconds || 10, sets || 4, cycles || 1, prepSeconds || 10, setRestSeconds || 60]
+    );
+
+    return res.json({ success: true, id: presetId });
+  } catch (err) {
+    console.error('Erro ao salvar treino personalizado:', err);
+    return res.status(500).json({ error: 'Erro ao salvar treino personalizado.' });
+  }
+});
+
+app.delete('/api/presets/:id', authenticateToken, async (req, res) => {
+  try {
+    await dbAdapter.execute(
+      'DELETE FROM custom_presets WHERE id = ? AND user_id = ?',
+      [req.params.id, req.user.id],
+      'DELETE FROM custom_presets WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.user.id]
+    );
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao excluir treino personalizado.' });
+  }
+});
+
+// ================= USER SETTINGS ROUTES =================
+
+app.get('/api/settings', authenticateToken, async (req, res) => {
+  try {
+    const row = await dbAdapter.queryOne(
+      `SELECT sound_enabled as "soundEnabled", volume, theme_mode as "themeMode", 
+              weekly_goal as "weeklyGoal", glassmorphism_enabled as "glassmorphismEnabled"
+       FROM user_settings 
+       WHERE user_id = ?`,
+      [req.user.id],
+      `SELECT sound_enabled as "soundEnabled", volume, theme_mode as "themeMode", 
+              weekly_goal as "weeklyGoal", glassmorphism_enabled as "glassmorphismEnabled"
+       FROM user_settings 
+       WHERE user_id = $1`,
+      [req.user.id]
+    );
+    if (!row) return res.json(null);
+    return res.json({
+      soundEnabled: Boolean(row.soundEnabled),
+      volume: Number(row.volume),
+      themeMode: row.themeMode || 'dark',
+      weeklyGoal: Number(row.weeklyGoal) || 5,
+      glassmorphismEnabled: Boolean(row.glassmorphismEnabled),
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao carregar configurações.' });
+  }
+});
+
+app.put('/api/settings', authenticateToken, async (req, res) => {
+  try {
+    const { soundEnabled, volume, themeMode, weeklyGoal, glassmorphismEnabled } = req.body;
+    await dbAdapter.execute(
+      `UPDATE user_settings 
+       SET sound_enabled = COALESCE(?, sound_enabled),
+           volume = COALESCE(?, volume),
+           theme_mode = COALESCE(?, theme_mode),
+           weekly_goal = COALESCE(?, weekly_goal),
+           glassmorphism_enabled = COALESCE(?, glassmorphism_enabled)
+       WHERE user_id = ?`,
+      [
+        soundEnabled !== undefined ? (soundEnabled ? 1 : 0) : null,
+        volume !== undefined ? volume : null,
+        themeMode || null,
+        weeklyGoal || null,
+        glassmorphismEnabled !== undefined ? (glassmorphismEnabled ? 1 : 0) : null,
+        req.user.id,
+      ],
+      `UPDATE user_settings 
+       SET sound_enabled = COALESCE($1, sound_enabled),
+           volume = COALESCE($2, volume),
+           theme_mode = COALESCE($3, theme_mode),
+           weekly_goal = COALESCE($4, weekly_goal),
+           glassmorphism_enabled = COALESCE($5, glassmorphism_enabled)
+       WHERE user_id = $6`,
+      [
+        soundEnabled !== undefined ? (soundEnabled ? 1 : 0) : null,
+        volume !== undefined ? volume : null,
+        themeMode || null,
+        weeklyGoal || null,
+        glassmorphismEnabled !== undefined ? (glassmorphismEnabled ? 1 : 0) : null,
+        req.user.id,
+      ]
+    );
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: 'Erro ao salvar configurações.' });
   }
 });
 

@@ -29,7 +29,7 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
   let response: Response;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 300);
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     response = await fetch(endpoint, {
       ...options,
@@ -165,10 +165,16 @@ export const api = {
         durationMinutes: Math.round((item.durationSeconds || 0) / 60) || 1,
         dateStr: item.completedAt ? new Date(item.completedAt).toLocaleDateString('pt-BR') : 'Hoje',
         timestamp: item.completedAt ? new Date(item.completedAt).getTime() : Date.now(),
-        roundsCompleted: 4,
-        totalRounds: 4,
-        colorBorder: 'border-accent',
-        iconName: 'fi-rr-play-alt',
+        roundsCompleted: item.roundsCompleted || 4,
+        totalRounds: item.totalRounds || 4,
+        colorBorder: item.presetCategory === 'TABATA' ? 'border-[#d2f000]' : item.presetCategory === 'EMOM' ? 'border-[#ffb4aa]' : 'border-accent',
+        iconName: item.presetCategory === 'TABATA' ? 'local_fire_department' : item.presetCategory === 'EMOM' ? 'timer' : 'fitness_center',
+        workSeconds: item.workSeconds,
+        restSeconds: item.restSeconds,
+        prepSeconds: item.prepSeconds,
+        exercisesPerSet: item.exercisesPerSet,
+        setRestSeconds: item.setRestSeconds,
+        totalSets: item.totalSets,
       }));
     } catch (e) {
       const saved = localStorage.getItem('pulse_history');
@@ -187,6 +193,14 @@ export const api = {
           durationSeconds: item.durationMinutes * 60,
           completedAt: new Date(item.timestamp).toISOString(),
           caloriesBurned: item.durationMinutes * 8,
+          roundsCompleted: item.roundsCompleted,
+          totalRounds: item.totalRounds,
+          workSeconds: item.workSeconds,
+          restSeconds: item.restSeconds,
+          prepSeconds: item.prepSeconds,
+          exercisesPerSet: item.exercisesPerSet,
+          setRestSeconds: item.setRestSeconds,
+          totalSets: item.totalSets,
         }),
       });
     } catch (e) {
