@@ -18,17 +18,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || (mode === 'signup' && !name)) {
+    if (!email || !password || (mode === 'signup' && (!name || !confirmPassword))) {
       setErrorMsg('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    if (mode === 'signup' && password !== confirmPassword) {
+      setErrorMsg('As senhas não coincidem. Digite a mesma senha nos dois campos.');
       return;
     }
 
@@ -182,6 +189,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </button>
             </div>
           </div>
+
+          {mode === 'signup' && (
+            <div>
+              <label className="font-label-caps text-xs text-[#c6c9ab] block mb-1">CONFIRMAR SENHA</label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full bg-[#131313] border border-[#353534] rounded-xl pl-4 pr-11 py-3 text-sm text-[#e5e2e1] focus:border-accent outline-none"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#c6c9ab] hover:text-white p-1 cursor-pointer transition-colors"
+                  aria-label={showConfirmPassword ? 'Ocultar confirmação de senha' : 'Exibir confirmação de senha'}
+                >
+                  <i className={showConfirmPassword ? 'fi fi-rr-eye-crossed text-base' : 'fi fi-rr-eye text-base'} />
+                </button>
+              </div>
+            </div>
+          )}
 
           <button
             type="submit"
