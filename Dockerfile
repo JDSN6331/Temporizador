@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Install native build tools required for C/C++ native modules (better-sqlite3)
+RUN apk add --no-cache python3 make g++
+
 # Copy package files
 COPY package*.json ./
 
@@ -20,10 +23,12 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
+# Install native build tools for production dependencies
+RUN apk add --no-cache python3 make g++
+
 # Set environment
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV DB_PATH=/app/data/database.sqlite
 
 # Install production dependencies only
 COPY package*.json ./
@@ -34,12 +39,6 @@ COPY --from=builder /app/dist ./dist
 
 # Copy backend server.js script
 COPY server.js ./
-
-# Create data directory for persistent SQLite storage
-RUN mkdir -p /app/data
-
-# Mount persistent volume for SQLite database
-VOLUME ["/app/data"]
 
 EXPOSE 3000
 
