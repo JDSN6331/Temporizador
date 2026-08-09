@@ -75,8 +75,8 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
 
   // Form states for manual log
   const [manualTitle, setManualTitle] = useState('Crossfit WOD');
-  const [manualDuration, setManualDuration] = useState(30);
-  const [manualRounds, setManualRounds] = useState(5);
+  const [manualDuration, setManualDuration] = useState<number | ''>(30);
+  const [manualRounds, setManualRounds] = useState<number | ''>(5);
 
   const filteredItems = historyItems.filter((item) => {
     if (filterType === 'ALL') return true;
@@ -296,7 +296,10 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
                 <input
                   type="number"
                   value={manualDuration}
-                  onChange={(e) => setManualDuration(Number(e.target.value))}
+                  onChange={(e) => setManualDuration(e.target.value === '' ? '' : Number(e.target.value))}
+                  onBlur={() => {
+                    if (manualDuration === '' || manualDuration < 1) setManualDuration(30);
+                  }}
                   className="w-full bg-[#131313] border border-[#353534] rounded-xl px-4 py-2.5 text-[#e5e2e1] focus:border-accent outline-none text-sm"
                   min={1}
                   required
@@ -310,7 +313,10 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
                 <input
                   type="number"
                   value={manualRounds}
-                  onChange={(e) => setManualRounds(Math.max(1, Number(e.target.value)))}
+                  onChange={(e) => setManualRounds(e.target.value === '' ? '' : Number(e.target.value))}
+                  onBlur={() => {
+                    if (manualRounds === '' || manualRounds < 1) setManualRounds(5);
+                  }}
                   className="w-full bg-[#131313] border border-[#353534] rounded-xl px-4 py-2.5 text-[#e5e2e1] focus:border-accent outline-none text-sm"
                   min={1}
                   required

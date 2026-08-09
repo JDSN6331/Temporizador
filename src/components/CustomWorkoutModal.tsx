@@ -13,13 +13,20 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
   onSaveCustomPreset,
 }) => {
   const [name, setName] = useState('Treino Personalizado');
-  const [workSeconds, setWorkSeconds] = useState(20);
-  const [restSeconds, setRestSeconds] = useState(10);
-  const [prepSeconds, setPrepSeconds] = useState(10);
-  const [exercisesPerSet, setExercisesPerSet] = useState(8);
-  const [setRestDuration, setSetRestDuration] = useState(60);
-  const [totalSets, setTotalSets] = useState(4);
+  const [workSeconds, setWorkSeconds] = useState<number | ''>(20);
+  const [restSeconds, setRestSeconds] = useState<number | ''>(10);
+  const [prepSeconds, setPrepSeconds] = useState<number | ''>(10);
+  const [exercisesPerSet, setExercisesPerSet] = useState<number | ''>(8);
+  const [setRestDuration, setSetRestDuration] = useState<number | ''>(60);
+  const [totalSets, setTotalSets] = useState<number | ''>(4);
   const [saveToHome, setSaveToHome] = useState(true);
+
+  const parsedWork = Number(workSeconds) || 20;
+  const parsedRest = Number(restSeconds) || 0;
+  const parsedPrep = Number(prepSeconds) || 5;
+  const parsedExPerSet = Number(exercisesPerSet) || 8;
+  const parsedSetRest = Number(setRestDuration) || 60;
+  const parsedTotalSets = Number(totalSets) || 4;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,20 +34,32 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
       id: `custom_${Date.now()}`,
       name: name.trim() || 'Treino Personalizado',
       type: 'CUSTOM',
-      subtitle: `${workSeconds}s/${restSeconds}s • ${exercisesPerSet} EX × ${totalSets} SETS`,
-      workSeconds,
-      restSeconds,
-      prepSeconds,
-      exercisesPerSet,
-      setRestSeconds: setRestDuration,
-      totalSets,
-      totalRounds: exercisesPerSet * totalSets,
+      subtitle: `${parsedWork}s/${parsedRest}s • ${parsedExPerSet} EX × ${parsedTotalSets} SETS`,
+      workSeconds: parsedWork,
+      restSeconds: parsedRest,
+      prepSeconds: parsedPrep,
+      exercisesPerSet: parsedExPerSet,
+      setRestSeconds: parsedSetRest,
+      totalSets: parsedTotalSets,
+      totalRounds: parsedExPerSet * parsedTotalSets,
     };
 
     if (saveToHome && onSaveCustomPreset) {
       onSaveCustomPreset(customPreset);
     }
     onStartCustomWorkout(customPreset);
+  };
+
+  const handleNumChange = (
+    setter: React.Dispatch<React.SetStateAction<number | ''>>,
+    value: string
+  ) => {
+    if (value === '') {
+      setter('');
+    } else {
+      const num = parseInt(value, 10);
+      setter(isNaN(num) ? '' : num);
+    }
   };
 
   return (
@@ -81,9 +100,12 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
               <input
                 type="number"
                 value={workSeconds}
-                onChange={(e) => setWorkSeconds(Math.max(5, Number(e.target.value)))}
+                onChange={(e) => handleNumChange(setWorkSeconds, e.target.value)}
+                onBlur={() => {
+                  if (workSeconds === '' || workSeconds < 1) setWorkSeconds(20);
+                }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-accent font-black text-center text-lg focus:border-accent outline-none"
-                min={5}
+                min={1}
                 max={600}
               />
             </div>
@@ -94,7 +116,10 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
               <input
                 type="number"
                 value={restSeconds}
-                onChange={(e) => setRestSeconds(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => handleNumChange(setRestSeconds, e.target.value)}
+                onBlur={() => {
+                  if (restSeconds === '') setRestSeconds(0);
+                }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-[#ffb4aa] font-black text-center text-lg focus:border-[#ffb4aa] outline-none"
                 min={0}
                 max={600}
@@ -111,7 +136,10 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
               <input
                 type="number"
                 value={exercisesPerSet}
-                onChange={(e) => setExercisesPerSet(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => handleNumChange(setExercisesPerSet, e.target.value)}
+                onBlur={() => {
+                  if (exercisesPerSet === '' || exercisesPerSet < 1) setExercisesPerSet(8);
+                }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-[#e5e2e1] font-black text-center text-lg focus:border-accent outline-none"
                 min={1}
                 max={30}
@@ -124,7 +152,10 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
               <input
                 type="number"
                 value={totalSets}
-                onChange={(e) => setTotalSets(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => handleNumChange(setTotalSets, e.target.value)}
+                onBlur={() => {
+                  if (totalSets === '' || totalSets < 1) setTotalSets(4);
+                }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-accent font-black text-center text-lg focus:border-accent outline-none"
                 min={1}
                 max={20}
@@ -141,7 +172,10 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
               <input
                 type="number"
                 value={setRestDuration}
-                onChange={(e) => setSetRestDuration(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => handleNumChange(setSetRestDuration, e.target.value)}
+                onBlur={() => {
+                  if (setRestDuration === '') setSetRestDuration(60);
+                }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-[#ffb4aa] font-black text-center text-lg focus:border-[#ffb4aa] outline-none"
                 min={0}
                 max={600}
@@ -154,7 +188,10 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
               <input
                 type="number"
                 value={prepSeconds}
-                onChange={(e) => setPrepSeconds(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => handleNumChange(setPrepSeconds, e.target.value)}
+                onBlur={() => {
+                  if (prepSeconds === '') setPrepSeconds(5);
+                }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-[#adc6ff] font-black text-center text-lg focus:border-[#adc6ff] outline-none"
                 min={0}
                 max={60}
@@ -166,11 +203,11 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
           <div className="bg-[#131313] border border-[#353534] rounded-xl p-3 flex justify-between items-center font-label-caps text-xs">
             <span className="text-[#c6c9ab]">TOTAL ESTIMADO</span>
             <span className="text-accent font-bold">
-              {exercisesPerSet * totalSets} ROUNDS • ~
+              {parsedExPerSet * parsedTotalSets} ROUNDS • ~
               {Math.ceil(
-                (prepSeconds +
-                  totalSets *
-                    (exercisesPerSet * (workSeconds + restSeconds) + setRestDuration)) /
+                (parsedPrep +
+                  parsedTotalSets *
+                    (parsedExPerSet * (parsedWork + parsedRest) + parsedSetRest)) /
                   60
               )}{' '}
               MIN
@@ -178,21 +215,25 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
           </div>
 
           {/* SAVE TO HOME CHECKBOX */}
-          <label className="flex items-center gap-2.5 cursor-pointer text-xs font-label-caps text-[#e5e2e1] bg-[#131313] p-3 rounded-xl border border-[#353534] hover:border-accent/40 transition-colors">
+          <div className="flex items-center gap-2 pt-1">
             <input
               type="checkbox"
+              id="saveToHome"
               checked={saveToHome}
               onChange={(e) => setSaveToHome(e.target.checked)}
-              className="accent-accent w-4 h-4 cursor-pointer rounded"
+              className="accent-[#d2f000] w-4 h-4 rounded cursor-pointer"
             />
-            <span>Salvar treino como card na Home</span>
-          </label>
+            <label htmlFor="saveToHome" className="text-xs text-[#e5e2e1] font-medium cursor-pointer">
+              Salvar como cartão de acesso rápido na Home
+            </label>
+          </div>
 
+          {/* SUBMIT BUTTON */}
           <button
             type="submit"
-            className="w-full py-3.5 mt-2 bg-accent text-accent-dark rounded-2xl font-black font-label-caps text-xs tracking-wider hover:opacity-90 transition-opacity shadow-[0_0_15px_var(--accent-glow)] cursor-pointer"
+            className="w-full py-3.5 bg-accent text-accent-dark font-black font-label-caps text-xs tracking-wider rounded-xl hover:opacity-90 transition-opacity shadow-[0_0_15px_var(--accent-glow)] mt-2 cursor-pointer"
           >
-            INICIAR TREINO AGORA
+            INICIAR TREINO PERSONALIZADO →
           </button>
         </form>
       </div>

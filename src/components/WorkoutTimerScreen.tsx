@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { WorkoutPreset, TimerPhase, WorkoutHistoryItem } from '../types';
-import { playCountdownBeep, playPhaseChangeSound } from '../utils/sound';
+import { playCountdownBeep, playPhaseChangeSound, unlockAudio } from '../utils/sound';
 
 interface WorkoutTimerScreenProps {
   preset: WorkoutPreset;
@@ -85,6 +85,11 @@ export const WorkoutTimerScreen: React.FC<WorkoutTimerScreenProps> = ({
       document.title = 'Pulse & Precision - Timer de Treino HIIT & Tabata';
     };
   }, [secondsLeft, phase, isPaused]);
+
+  // Unlock Web Audio context on screen load
+  useEffect(() => {
+    unlockAudio();
+  }, []);
 
   // Prevent mobile screen from locking/sleeping during active workout
   useEffect(() => {
