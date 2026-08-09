@@ -54,10 +54,12 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
     setter: React.Dispatch<React.SetStateAction<number | ''>>,
     value: string
   ) => {
-    if (value === '') {
+    // Strip non-digit characters so user can type and backspace freely
+    const cleaned = value.replace(/[^0-9]/g, '');
+    if (cleaned === '') {
       setter('');
     } else {
-      const num = parseInt(value, 10);
+      const num = parseInt(cleaned, 10);
       setter(isNaN(num) ? '' : num);
     }
   };
@@ -98,15 +100,15 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
                 TRABALHO / EXER. (SEG)
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={workSeconds}
                 onChange={(e) => handleNumChange(setWorkSeconds, e.target.value)}
                 onBlur={() => {
                   if (workSeconds === '' || workSeconds < 1) setWorkSeconds(20);
                 }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-accent font-black text-center text-lg focus:border-accent outline-none"
-                min={1}
-                max={600}
               />
             </div>
             <div className="flex flex-col">
@@ -114,15 +116,15 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
                 DESCANSO / EXER. (SEG)
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={restSeconds}
                 onChange={(e) => handleNumChange(setRestSeconds, e.target.value)}
                 onBlur={() => {
                   if (restSeconds === '') setRestSeconds(0);
                 }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-[#ffb4aa] font-black text-center text-lg focus:border-[#ffb4aa] outline-none"
-                min={0}
-                max={600}
               />
             </div>
           </div>
@@ -134,15 +136,15 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
                 EXERCÍCIOS P/ SÉRIE
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={exercisesPerSet}
                 onChange={(e) => handleNumChange(setExercisesPerSet, e.target.value)}
                 onBlur={() => {
                   if (exercisesPerSet === '' || exercisesPerSet < 1) setExercisesPerSet(8);
                 }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-[#e5e2e1] font-black text-center text-lg focus:border-accent outline-none"
-                min={1}
-                max={30}
               />
             </div>
             <div className="flex flex-col">
@@ -150,15 +152,15 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
                 TOTAL DE SÉRIES
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={totalSets}
                 onChange={(e) => handleNumChange(setTotalSets, e.target.value)}
                 onBlur={() => {
                   if (totalSets === '' || totalSets < 1) setTotalSets(4);
                 }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-accent font-black text-center text-lg focus:border-accent outline-none"
-                min={1}
-                max={20}
               />
             </div>
           </div>
@@ -170,15 +172,15 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
                 DESCANSO SÉRIES (SEG)
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={setRestDuration}
                 onChange={(e) => handleNumChange(setSetRestDuration, e.target.value)}
                 onBlur={() => {
                   if (setRestDuration === '') setSetRestDuration(60);
                 }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-[#ffb4aa] font-black text-center text-lg focus:border-[#ffb4aa] outline-none"
-                min={0}
-                max={600}
               />
             </div>
             <div className="flex flex-col">
@@ -186,15 +188,15 @@ export const CustomWorkoutModal: React.FC<CustomWorkoutModalProps> = ({
                 PREPARAÇÃO (SEG)
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={prepSeconds}
                 onChange={(e) => handleNumChange(setPrepSeconds, e.target.value)}
                 onBlur={() => {
                   if (prepSeconds === '') setPrepSeconds(5);
                 }}
                 className="w-full h-11 bg-[#131313] border border-[#353534] rounded-xl px-3 text-[#adc6ff] font-black text-center text-lg focus:border-[#adc6ff] outline-none"
-                min={0}
-                max={60}
               />
             </div>
           </div>

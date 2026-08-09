@@ -294,14 +294,18 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
                   Duração (Minutos)
                 </label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={manualDuration}
-                  onChange={(e) => setManualDuration(e.target.value === '' ? '' : Number(e.target.value))}
+                  onChange={(e) => {
+                    const cleaned = e.target.value.replace(/[^0-9]/g, '');
+                    setManualDuration(cleaned === '' ? '' : parseInt(cleaned, 10));
+                  }}
                   onBlur={() => {
                     if (manualDuration === '' || manualDuration < 1) setManualDuration(30);
                   }}
                   className="w-full bg-[#131313] border border-[#353534] rounded-xl px-4 py-2.5 text-[#e5e2e1] focus:border-accent outline-none text-sm"
-                  min={1}
                   required
                 />
               </div>
@@ -311,14 +315,18 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
                   Rounds Realizados
                 </label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={manualRounds}
-                  onChange={(e) => setManualRounds(e.target.value === '' ? '' : Number(e.target.value))}
+                  onChange={(e) => {
+                    const cleaned = e.target.value.replace(/[^0-9]/g, '');
+                    setManualRounds(cleaned === '' ? '' : parseInt(cleaned, 10));
+                  }}
                   onBlur={() => {
                     if (manualRounds === '' || manualRounds < 1) setManualRounds(5);
                   }}
                   className="w-full bg-[#131313] border border-[#353534] rounded-xl px-4 py-2.5 text-[#e5e2e1] focus:border-accent outline-none text-sm"
-                  min={1}
                   required
                 />
               </div>
