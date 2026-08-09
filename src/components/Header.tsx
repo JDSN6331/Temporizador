@@ -36,9 +36,11 @@ export const Header: React.FC<HeaderProps> = ({
       </button>
 
       <div className="flex items-center gap-2.5">
-        <div className="w-8 h-8 bg-accent text-accent-dark rounded-xl flex items-center justify-center font-black text-xs shadow-[0_0_10px_var(--accent-glow)] shrink-0">
-          P&P
-        </div>
+        <img
+          src="/icons/icon-192.png"
+          alt="Pulse & Precision Logo"
+          className="w-8 h-8 rounded-xl object-cover drop-shadow-[0_0_8px_var(--accent-glow)]"
+        />
         <h1 className="font-extrabold text-lg md:text-xl tracking-tighter text-accent uppercase text-center font-['Inter']">
           {title}
         </h1>

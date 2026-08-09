@@ -42,22 +42,23 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
   }
 
   let data: any = null;
-  try {
-    const text = await response.text();
-    if (text && text.trim().startsWith('{')) {
-      data = JSON.parse(text);
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = null;
     }
-  } catch (e) {
-    data = null;
   }
 
   if (!response.ok) {
     if (data && data.error) {
       throw new Error(data.error);
     }
-    if (response.status === 404 || response.status === 401) {
-      throw new Error('Conta não cadastrada ou senha incorreta. Clique na aba CADASTRAR para criar sua conta.');
-    }
+    throw new Error('SERVER_OFFLINE');
+  }
+
+  if (!data) {
     throw new Error('SERVER_OFFLINE');
   }
 

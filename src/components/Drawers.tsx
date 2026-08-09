@@ -23,9 +23,11 @@ export const SideMenuDrawer: React.FC<SideMenuDrawerProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#201f1f]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-accent text-accent-dark rounded-xl flex items-center justify-center font-black text-xs shadow-[0_0_10px_var(--accent-glow)] shrink-0">
-                P&P
-              </div>
+              <img
+                src="/icons/icon-192.png"
+                alt="Pulse & Precision Logo"
+                className="w-8 h-8 rounded-xl object-cover drop-shadow-[0_0_8px_var(--accent-glow)]"
+              />
               <h2 className="font-extrabold text-base text-accent uppercase tracking-tighter">
                 PULSE & PRECISION
               </h2>

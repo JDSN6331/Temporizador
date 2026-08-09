@@ -78,9 +78,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* LOGO AND TITLE */}
         <div className="text-center mb-6">
-          <div className="w-14 h-14 bg-accent text-accent-dark rounded-2xl mx-auto mb-2 flex items-center justify-center font-black text-2xl shadow-[0_0_20px_var(--accent-glow)]">
-            P&P
-          </div>
+          <img
+            src="/icons/icon-512.png"
+            alt="Pulse & Precision Logo"
+            className="w-16 h-16 rounded-2xl mx-auto mb-3 object-cover shadow-[0_0_25px_var(--accent-glow)]"
+          />
           <p className="font-black text-accent text-xs tracking-widest uppercase mb-1 font-label-caps">
             PULSE & PRECISION
           </p>
